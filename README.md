@@ -1,96 +1,145 @@
 # Soroban Boilerplate
 
-This project is a complete boilerplate for developing smart contracts on Stellar using Soroban.
-It was designed to be a reusable skeleton, including example contracts, local tests, and scripts to simplify deployment.
+This project is a boilerplate for developing smart contracts on Stellar using Soroban. It automatically includes example contracts, automation scripts, integration tests, and reference documentation.
 
 ## Project Structure
 
-- `contracts/`: Example contracts demonstrating fundamental Soroban features.
-  - `hello_world/`: A simple string-passing contract.
-  - `increment/`: A contract with local storage.
-  - `token/`: A simplified demo version of a customizable token contract.
-- `scripts/`: Automated utilities to facilitate deployment and interaction with contracts.
-- `docker-compose.yml`: File to start the isolated local Stellar/Soroban infrastructure using Quickstart.
-- `.cursor/`: Cursor-focused documentation and context guides.
-- `.env.example`: Example environment variables configuration with links to Stellar networks.
+- `.cursor/`: Comprehensive documentation of the Stellar ecosystem (used by Cursor editor).
+- `contracts/`: Example contracts.
+  - `hello_world`: A simple contract that returns a greeting.
+  - `increment`: A contract with a persistent counter (demonstrates storage and TTL usage).
+  - `token`: Basic token implementation (fungible).
+- `scripts/`: Utilities for deploying, interaction, and local testing.
+- `tests/`: Integration tests encompassing multiple contracts.
+- `docker-compose.yml`: Spins up a local Stellar network for testing.
+- `.env.example`: Environment configuration template example.
 
 ## Prerequisites
 
-1. [Rust](https://rustup.rs/) installed on your host system.
-2. Add the `wasm32` target:
+- Rust (with `wasm32-unknown-unknown` target installed)
+- [Stellar CLI](https://developers.stellar.org/docs/tools/stellar-cli)
+- Docker (optional, for local network)
+- Node.js (optional, if you're using an example frontend – not included by default)
+
+## Initial Setup
+
+1. Clone this repository.
+2. Copy `.env.example` to `.env` and adjust the variables based on your desired test network (testnet is standard).
+3. If using testnet, generate an identity and fund it via Friendbot:
    ```bash
-   rustup target add wasm32-unknown-unknown
+   stellar keys generate alice --network testnet --fund
    ```
-3. [Stellar CLI](https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup) installed:
+4. For the local network, start the container:
    ```bash
-   cargo install --locked stellar-cli --features opt
+   docker-compose up -d
+   stellar keys generate alice --network local --fund
    ```
-4. [Docker](https://docs.docker.com/get-docker/) installed, if you want to run the local testnet using Quickstart.
 
-## Stellar CLI Setup
+## Compiling Contracts
 
-### 1. Create Identities (Keys)
-
-Create a key in the CLI and fund the account via friendbot:
-
-```bash
-stellar keys generate alice --network testnet
-```
-
-### 2. Local Network using Docker
-
-For a purely isolated environment, start the local quickstart:
-
-```bash
-docker-compose up
-```
-
-## How to use (Workflow)
-
-### 1. Compiling the Contracts
-
-It is recommended to use the native Stellar CLI utility to compile optimally for `wasm` with reduced size.
+To compile all contracts:
 
 ```bash
 stellar contract build
+# or
+cargo build --target wasm32-unknown-unknown --release
 ```
 
-### 2. Running Unit Tests
+The resulting `.wasm` files will be generated in `target/wasm32-unknown-unknown/release/`.
 
-The boilerplate already has automated tests. To ensure safety:
+## Tests
+
+- **Unit Tests** (Inside each contract):
+  ```bash
+  cargo test
+  ```
+- **Integration Tests** (Between multiple contracts):
+  ```bash
+  cargo test --test integration
+  ```
+- **Local Network Tests** (Using Quickstart):
+  ```bash
+  ./scripts/test_local.sh
+  ```
+
+## Deploy
+
+To deploy a contract on your configured network:
 
 ```bash
-cargo test
+./scripts/deploy.sh <contract_name>
 ```
 
-Or use the provided test script:
-
-```bash
-./scripts/test_local.sh
-```
-
-### 3. Deploy Contracts (to testnet)
-
-Use the provided automated deploy script (which will use the `alice` key):
+Example:
 
 ```bash
 ./scripts/deploy.sh hello_world
-./scripts/deploy.sh increment
-./scripts/deploy.sh token
 ```
 
-### 4. Interact with a published contract
+The script defaults to the `alice` identity. You can easily alter the script to accept other identity inputs.
 
-After deployment, keep the Contract ID that appears in your console and invoke functions:
+## Interacting with Contracts
+
+Use the `interact.sh` script to invoke functions seamlessly:
 
 ```bash
-./scripts/interact.sh <CONTRACT_ID> hello --to Soroban
+./scripts/interact.sh <contract_id> <function> [arguments...]
 ```
+
+Example (invoking `hello` from the hello_world contract):
+
+```bash
+./scripts/interact.sh C... hello --to World
+```
+
+For more complex commands, consult the [Stellar CLI documentation](https://developers.stellar.org/docs/tools/stellar-cli).
+
+## Reference Documentation
+
+The `.cursor` folder contains detailed guides about multiple topics:
+
+- `contracts-soroban.md`: Smart contract development guide.
+- `frontend-stellar-sdk.md`: Integrating with frontends safely.
+- `security.md`: Comprehensive security checklist.
+- `testing.md`: Validated testing methodologies and strategies.
+- `stellar-assets.md`: Instructions for emitting assets.
+- `api-rpc-horizon.md`: Data accessing and Horizon usage.
+- `advanced-patterns.md`: Advance smart contract design patterns.
+- `common-pitfalls.md`: Famous mistakes and their solutions.
+- `zk-proofs.md`: Zero Knowledge Proofs usage.
+- `ecosystem.md`: Great mapping of ecosystem tools/projects.
+- `resources.md`: Useful links and tooling.
+- `standards-reference.md`: A quick cheat sheet of SEPs/CAPs.
+- `SKILL.md`: Main orchestrator file that feeds context to AI.
+
+These context rules were inspired by and acquired from the [stellar-dev-skill](https://github.com/stellar/stellar-dev-skill) repository. They're heavily optimized if you use an AI-assisted editor like Cursor.
 
 ## Customization
 
-Add new contract directories to the root of `contracts/` and, if necessary, update the workspace `Cargo.toml` file. It's always recommended to write the respective test functions in the `/tests` folder or inline modules to guarantee test coverage.
+To add a brand new contract to the workspace:
 
-## Acknowledgments
+1. Build a new folder inside `contracts/` using your target name.
+2. Inside it, place a `Cargo.toml` carrying:
 
-The `.cursor/` skills and context rules used in this project were inspired by and acquired from the [stellar-dev-skill](https://github.com/stellar/stellar-dev-skill) repository.
+   ```toml
+   [package]
+   name = "my-contract"
+   version = "0.1.0"
+   edition = "2021"
+
+   [lib]
+   crate-type = ["cdylib"]
+
+   [dependencies]
+   soroban-sdk = { workspace = true }
+
+   [dev-dependencies]
+   soroban-sdk = { workspace = true, features = ["testutils"] }
+   ```
+
+3. Type out your code straight onto `src/lib.rs` alongside `src/test.rs`.
+4. Include the project into your root workspace `Cargo.toml` if it's placed somewhere other than `contracts/*` directory scope.
+
+## Contribution
+
+Issues and pull requests presenting better implementations are more than welcome.

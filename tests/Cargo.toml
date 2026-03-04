@@ -1,0 +1,14 @@
+[package]
+name = "integration-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+soroban-sdk = { workspace = true }
+hello-world = { path = "../contracts/hello_world" }
+increment = { path = "../contracts/increment" }
+token = { path = "../contracts/token" }
+
+[[test]]
+name = "integration"
+path = "integration.rs"

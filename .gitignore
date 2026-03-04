@@ -1,6 +1,13 @@
-# Rust's output directory
-target
+/target
+**/*.rs.bk
+.env
+.DS_Store
+node_modules/
+dist/
+.stellar/
+.soroban/
 
-# Local settings
-.soroban
-.stellar
+# Se houver frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
