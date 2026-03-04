@@ -90,3 +90,7 @@ After deployment, keep the Contract ID that appears in your console and invoke f
 ## Customization
 
 Add new contract directories to the root of `contracts/` and, if necessary, update the workspace `Cargo.toml` file. It's always recommended to write the respective test functions in the `/tests` folder or inline modules to guarantee test coverage.
+
+## Acknowledgments
+
+The `.cursor/` skills and context rules used in this project were inspired by and acquired from the [stellar-dev-skill](https://github.com/stellar/stellar-dev-skill) repository.
