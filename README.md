@@ -1,4 +1,4 @@
-# 🚀 Soroban Boilerplate
+# 🚀 Soroban Boilerplate (AI-Assisted Development)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-1.84%2B-blue)](https://www.rust-lang.org)
@@ -10,11 +10,12 @@ This boilerplate was created to **accelerate the start of new projects** and is 
 - 📦 **Rust workspace structure** with multiple example contracts.
 - 🔧 **Ready-to-use scripts** for deployment, interaction, and testing.
 - 🧪 **Unit and integration tests** configured.
-- 📚 **Extensive documentation** (inside the `.cursor/` folder) for quick reference – acting as the brain for your AI assistant so you can focus on the vibe.
+- 🤖 **Antigravity & Cursor Ready** – Comes with pre-configured rules and skills in `.agents/` and `.cursor/` to make your AI assistant a Soroban expert.
+- 📚 **Extensive documentation** – Acting as the brain for your AI assistant so you can focus on the vibe.
 - 🐳 **Local network support** via Docker (Stellar Quickstart).
 - 🔐 **Security best practices** and advanced patterns.
 
-Whether you are starting with Soroban or want a solid starting point for a real project using the latest AI-driven workflows, this boilerplate is for you.
+Whether you are starting with Soroban or want a solid starting point for a real project using the latest AI-driven workflows (like **Antigravity**), this boilerplate is for you.
 
 ---
 
@@ -22,12 +23,12 @@ Whether you are starting with Soroban or want a solid starting point for a real 
 
 ```
 .
+├── .agents/                     # Antigravity Agent Configuration (Skills & Workflows)
+│   ├── skills/stellar-dev/      # Soroban specialized knowledge
+│   └── workflows/project-rules.md # Project-specific AI guidelines
 ├── .cursor/                     # Complete documentation of the Stellar ecosystem
-│   ├── contracts-soroban.md
-│   ├── security.md
-│   ├── testing.md
-│   └── ... (13 files total)
-├── .cursorrules                 # Rules for the Cursor editor
+│   └── ... (13 documentation files)
+├── .cursorrules                 # Legacy rules for the Cursor editor
 ├── .env.example                 # Example environment variables
 ├── Cargo.toml                   # Main workspace
 ├── docker-compose.yml           # Local Stellar network
@@ -154,43 +155,49 @@ This script boots up the local network (via Docker), deploys the contracts, and 
 
 ## 🚀 Deploy
 
-To deploy a contract to the configured network (testnet, local, etc.):
+To deploy a contract to the configured network:
 
 ```bash
-./scripts/deploy.sh <contract_name>
+./scripts/deploy.sh <contract_name> [--source <identity>] [--network <network>]
 ```
 
-Example:
+The script reads defaults from your `.env` file (`STELLAR_NETWORK`, `STELLAR_IDENTITY`). You can override them via CLI flags:
 
 ```bash
+# Uses defaults from .env (identity: alice, network: testnet)
 ./scripts/deploy.sh hello_world
-```
 
-The script uses the `alice` identity by default. You can easily modify it to accept other identities as a parameter.
+# Override identity and network
+./scripts/deploy.sh hello_world --source bob --network local
+```
 
 **Expected output:**
 
 ```
-$ ./scripts/deploy.sh hello_world
 Deploying hello_world...
+  Network:  testnet
+  Identity: alice
 Contract ID: CABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890
-Deploy successful!
 ```
 
 ---
 
 ## 🤝 Interacting with Contracts
 
-Use the `interact.sh` script to invoke functions simply:
+Use the `interact.sh` script to invoke contract functions:
 
 ```bash
-./scripts/interact.sh <contract_id> <function> [arguments...]
+./scripts/interact.sh <contract_id> <function_name> [--source <identity>] [--network <network>] [-- args...]
 ```
 
-Example (invoking `hello` from the hello_world contract):
+Examples:
 
 ```bash
-./scripts/interact.sh CABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 hello --to World
+# Uses defaults from .env
+./scripts/interact.sh CABCDEF...7890 hello -- --to World
+
+# Override identity and network
+./scripts/interact.sh CABCDEF...7890 hello --source bob --network local -- --to World
 ```
 
 Expected output:
@@ -223,6 +230,19 @@ These documents are especially useful if you use the **Cursor** editor, as the A
 | `resources.md`            | Useful links (official documentation, SDKs, examples)     |
 | `standards-reference.md`  | Quick reference for SEPs and CAPs                         |
 | `SKILL.md`                | Main AI orchestrator (defines the assistant's scope)      |
+
+---
+
+## 🤖 AI Agent Configuration (Antigravity)
+
+This project is optimized for the **Antigravity** agent. The configuration is stored in the `.agents/` directory:
+
+- **Skills (`.agents/skills/`)**: Contains the `stellar-dev` skill, a comprehensive knowledge base about Stellar and Soroban. The agent automatically consults these files when you ask about contract development, security, or deployment.
+- **Workflows (`.agents/workflows/`)**:
+  - `project-rules.md`: Defines the global behavior of the agent (e.g., responding in Portuguese, following DRY/KISS principles).
+  - Use `/project-rules` to explicitly invoke the project's guidelines.
+
+The agent uses these rules to ensure high-quality code, proper error handling, and adherence to the Stellar ecosystem's best practices without manual intervention.
 
 ---
 
